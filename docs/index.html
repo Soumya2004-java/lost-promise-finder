@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lost Promise Finder</title>
+  <style>
+    :root { --bg:#0b1020; --panel:rgba(255,255,255,.1); --panel-strong:rgba(255,255,255,.16); --line:rgba(255,255,255,.16); --ink:#f7f7ff; --muted:#b5bad1; --violet:#9b8cff; --mint:#72e3b0; --amber:#ffd27a; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:radial-gradient(circle at 85% 5%, rgba(111,92,255,.28), transparent 30rem), radial-gradient(circle at 0% 100%, rgba(55,214,175,.13), transparent 24rem), linear-gradient(135deg,#0b1020,#171a3a 55%,#0b1020); }
+    button, textarea { font:inherit; }
+    .shell { width:min(1120px, calc(100% - 36px)); margin:0 auto; padding:36px 0 120px; }
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+    .eyebrow { color:var(--muted); font-size:12px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
+    h1 { margin:7px 0 0; font-size:clamp(2rem, 4vw, 3.3rem); letter-spacing:-.06em; line-height:1; }
+    .avatar { width:46px; height:46px; display:grid; place-items:center; border:1px solid var(--line); border-radius:50%; color:#fff; font-weight:800; background:var(--panel-strong); box-shadow:0 12px 28px rgba(0,0,0,.2); }
+    .glass { border:1px solid var(--line); background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.07)); box-shadow:0 20px 55px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.08); backdrop-filter:blur(20px); }
+    .hero { position:relative; overflow:hidden; border-radius:28px; padding:30px; margin-bottom:18px; }
+    .hero:after { content:"✦"; position:absolute; right:34px; top:24px; color:var(--amber); font-size:42px; opacity:.75; }
+    .hero h2 { max-width:580px; margin:14px 0 8px; font-size:clamp(1.8rem, 4vw, 3rem); letter-spacing:-.055em; line-height:1.02; }
+    .hero p { max-width:570px; margin:0 0 22px; color:#d0d3e4; line-height:1.6; }
+    .primary { border:0; border-radius:15px; padding:13px 18px; color:#25233e; background:#fff; font-weight:800; cursor:pointer; box-shadow:0 10px 25px rgba(0,0,0,.15); }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:28px; }
+    .stat { border-radius:20px; padding:18px; }
+    .stat strong { display:block; margin-bottom:7px; font-size:1.8rem; }
+    .stat span { color:var(--muted); font-size:.78rem; }
+    .violet { color:var(--violet); background:rgba(140,124,255,.18); } .gold { color:var(--amber); background:rgba(255,199,102,.14); } .green { color:var(--mint); background:rgba(114,227,176,.13); }
+    .section-head { display:flex; align-items:center; justify-content:space-between; margin:0 0 12px; }
+    h3 { margin:0; font-size:1.25rem; letter-spacing:-.03em; }
+    .text-button { border:0; color:var(--violet); background:transparent; cursor:pointer; font-weight:700; }
+    .promise-list { display:grid; gap:12px; }
+    .promise { display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:14px; border-radius:20px; padding:16px; }
+    .promise-icon { width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:rgba(255,255,255,.12); color:var(--violet); font-size:1.15rem; }
+    .promise h4 { margin:0 0 5px; font-size:1rem; } .promise p { margin:0; color:var(--muted); font-size:.84rem; }
+    .due { color:var(--amber); font-size:.78rem; font-weight:800; white-space:nowrap; }
+    .insight { display:flex; gap:12px; margin-top:18px; border-radius:20px; padding:18px; color:#e8e7ff; background:rgba(140,124,255,.15); }
+    .insight b { display:block; color:var(--violet); margin-bottom:4px; }
+    .nav { position:fixed; z-index:3; left:50%; bottom:18px; transform:translateX(-50%); display:flex; width:min(520px, calc(100% - 36px)); padding:7px; border-radius:50px; }
+    .nav button { flex:1; border:0; border-radius:40px; padding:12px 8px; color:var(--muted); background:transparent; cursor:pointer; font-size:.8rem; font-weight:700; }
+    .nav button.active { color:#fff; background:rgba(255,255,255,.2); }
+    dialog { width:min(600px, calc(100% - 30px)); border:1px solid var(--line); border-radius:26px; padding:0; color:var(--ink); background:#171a3a; box-shadow:0 30px 100px rgba(0,0,0,.55); }
+    dialog::backdrop { background:rgba(3,5,15,.7); backdrop-filter:blur(7px); }
+    .dialog-inner { padding:25px; } .dialog-head { display:flex; align-items:center; justify-content:space-between; }
+    .close { border:0; color:var(--muted); background:transparent; font-size:1.4rem; cursor:pointer; }
+    textarea { width:100%; min-height:160px; margin:18px 0 12px; resize:vertical; border:1px solid var(--line); border-radius:17px; padding:15px; color:var(--ink); outline:none; background:rgba(255,255,255,.08); }
+    textarea:focus { border-color:var(--violet); } .result { display:none; margin-top:20px; } .result.show { display:block; }
+    .result-item { display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); padding:13px 0; } .result-item:last-child { border:0; }
+    @media (max-width:620px) { .shell{width:min(100% - 24px,1120px); padding-top:24px;} .hero{padding:23px;} .stats{gap:8px;} .stat{padding:13px 11px;} .promise{grid-template-columns:40px 1fr;}.promise .due{grid-column:2;} }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header><div><div class="eyebrow">Lost Promise Finder</div><h1>Make good on it.</h1></div><div class="avatar">LP</div></header>
+    <section class="hero glass"><div class="eyebrow">AI NOTE ANALYSIS</div><h2>Turn messy notes into momentum.</h2><p>Find the promises hiding in your meeting notes, then turn them into clear next steps before they become follow-ups.</p><button class="primary" id="openAnalyzer">✦ &nbsp; Analyze new notes</button></section>
+    <section class="stats"><div class="stat glass violet"><strong>4</strong><span>Open promises</span></div><div class="stat glass gold"><strong>1</strong><span>Needs attention</span></div><div class="stat glass green"><strong>12</strong><span>Closed this month</span></div></section>
+    <div class="section-head"><h3>Needs your attention</h3><button class="text-button" id="viewAll">View all</button></div>
+    <section class="promise-list" id="promiseList">
+      <article class="promise glass"><div class="promise-icon">◷</div><div><h4>Send revised budget to Priya</h4><p>You · Budget review</p></div><div class="due">Due today</div></article>
+      <article class="promise glass"><div class="promise-icon">⚑</div><div><h4>Confirm room booking for showcase</h4><p>You · Student org</p></div><div class="due">Due tomorrow</div></article>
+      <article class="promise glass"><div class="promise-icon">◌</div><div><h4>Review Q3 campaign brief</h4><p>Priya · Campaign</p></div><div class="due">Due Nov 08</div></article>
+    </section>
+    <section class="insight"><div>✦</div><div><b>A small nudge</b>You have 2 promises due in the next 48 hours. Clear them before they become follow-ups.</div></section>
+  </main>
+  <nav class="nav glass"><button class="active">⌂ &nbsp; Home</button><button id="promisesTab">⚑ &nbsp; Promises</button><button>⚙ &nbsp; Settings</button></nav>
+  <dialog id="analyzer"><div class="dialog-inner"><div class="dialog-head"><h3>What did you say you’d do?</h3><button class="close" id="closeAnalyzer">×</button></div><p style="color:var(--muted)">Paste meeting, class, or chat notes and we’ll surface the commitments worth remembering.</p><textarea id="notes" placeholder="e.g. I’ll send the revised budget to Priya by Friday…"></textarea><button class="primary" id="findPromises">✦ &nbsp; Find my promises</button><div class="result" id="result"><h3>We found 3 promises</h3><div class="result-item"><span>Send revised budget to Priya</span><b style="color:var(--amber)">Due Friday</b></div><div class="result-item"><span>Share the final deck</span><b style="color:var(--mint)">Owner: You</b></div><div class="result-item"><span>Confirm the review time</span><b style="color:var(--violet)">Missing deadline</b></div></div></div></dialog>
+  <script>
+    const dialog=document.querySelector('#analyzer'); const notes=document.querySelector('#notes'); const result=document.querySelector('#result');
+    document.querySelector('#openAnalyzer').onclick=()=>dialog.showModal(); document.querySelector('#closeAnalyzer').onclick=()=>dialog.close();
+    document.querySelector('#findPromises').onclick=()=>{ if(notes.value.trim()) result.classList.add('show'); };
+    document.querySelector('#viewAll').onclick=()=>document.querySelector('#promiseList').scrollIntoView({behavior:'smooth'});
+    document.querySelector('#promisesTab').onclick=()=>document.querySelector('#promiseList').scrollIntoView({behavior:'smooth'});
+  </script>
+</body>
+</html>
